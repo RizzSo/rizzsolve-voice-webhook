@@ -12,7 +12,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # --- Twilio setup ---
-ACCOUNT_SID = 'your_account_sid_here'
+ACCOUNT_SID = 'US051ac6e2484f2ab3e3f62e42b6c3b804'
 AUTH_TOKEN = 'your_auth_token_here'
 TWILIO_NUMBER = '+1yourtwilionumber'
 client = Client(ACCOUNT_SID, AUTH_TOKEN)
