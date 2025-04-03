@@ -1,28 +1,28 @@
 from flask import Flask, request, Response
 from twilio.twiml.voice_response import VoiceResponse
-from twilio.twiml.messaging_response import MessagingResponse
 import os
 
 app = Flask(__name__)
 
-# Health check route (optional)
-@app.route("/", methods=["GET"])
-def index():
-    return "Rizzsolve webhook is live!"
-
-# Voice webhook
 @app.route("/voice", methods=["POST"])
 def voice():
     response = VoiceResponse()
-    response.say("Hello from Rizzsolve! Thanks for calling.", voice='alice')
+    gather = response.gather(num_digits=1, action="/handle-key", method="POST")
+    gather.say("Hello from Rizzsolve. Press 1 to confirm your appointment. Press 2 to reschedule.")
+    response.redirect("/voice")  # If no input, repeat
     return Response(str(response), mimetype='text/xml')
 
-# SMS webhook (optional, for future use)
-@app.route("/sms", methods=["POST"])
-def sms():
-    incoming_msg = request.form.get("Body")
-    response = MessagingResponse()
-    response.message(f"Rizzsolve received your message: {incoming_msg}")
+@app.route("/handle-key", methods=["POST"])
+def handle_key():
+    digit = request.form.get("Digits")
+    response = VoiceResponse()
+    if digit == "1":
+        response.say("Appointment confirmed. Thank you.")
+    elif digit == "2":
+        response.say("We'll send you a link to reschedule.")
+    else:
+        response.say("Sorry, I didn't get that.")
+        response.redirect("/voice")
     return Response(str(response), mimetype='text/xml')
 
 if __name__ == "__main__":
