@@ -1,23 +1,16 @@
-from flask import Flask
-from twilio.rest import Client
-import os
+from flask import Flask, request, Response
+from twilio.twiml.voice_response import VoiceResponse
 
 app = Flask(__name__)
 
-@app.route("/")
-def home():
-    return "App is running!"
-
-@app.route("/send-reminder")
-def send_reminder():
-    client = Client(os.getenv("TWILIO_ACCOUNT_SID"), os.getenv("TWILIO_AUTH_TOKEN"))
-    message = client.messages.create(
-        body="This is your reminder!",
-        from_=os.getenv("TWILIO_PHONE_NUMBER"),
-        to="+19876543210"  # Replace with recipient number
-    )
-    return f"Message sent: {message.sid}"
+@app.route("/voice", methods=["POST"])
+def voice():
+    response = VoiceResponse()
+    response.say("Hello from Rizzsolve! Thanks for calling.", voice='alice')
+    return Response(str(response), mimetype='text/xml')
 
 if __name__ == "__main__":
-    app.run()
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
 
